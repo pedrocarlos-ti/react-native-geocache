@@ -2,7 +2,10 @@ import React from "react";
 import { StatusBar } from "expo-status-bar";
 
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import {
+  CardStyleInterpolators,
+  createStackNavigator,
+} from "@react-navigation/stack";
 
 import List from "./screens/List";
 import Details from "./screens/Details";
@@ -32,6 +35,8 @@ const AppWithContainer = () => (
         component={Details}
         options={({ route }) => ({
           title: route.params?.title,
+          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+          gestureEnabled: true,
         })}
       />
     </Stack.Navigator>
