@@ -9,8 +9,9 @@ import {
 
 import List from "./screens/List";
 import Details from "./screens/Details";
+import CreateCache from "./screens/CreateCache";
 
-import { AddButton } from "./components/Navigation";
+import { AddButton, CloseButton } from "./components/Navigation";
 
 const Stack = createStackNavigator();
 
@@ -24,7 +25,7 @@ const AppWithContainer = () => (
       }}
     >
       <Stack.Screen
-        name="Caches"
+        name="List"
         component={List}
         options={({ navigation }) => ({
           headerRight: () => <AddButton navigation={navigation} />,
@@ -34,9 +35,19 @@ const AppWithContainer = () => (
         name="Details"
         component={Details}
         options={({ route }) => ({
-          title: route.params?.title,
+          title: route.params?.item.title,
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
           gestureEnabled: true,
+        })}
+      />
+      <Stack.Screen
+        name="CreateCache"
+        component={CreateCache}
+        options={({ navigation }) => ({
+          title: "Create Cache",
+          headerRight: () => <CloseButton navigation={navigation} />,
+          headerLeft: null,
+          cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS,
         })}
       />
     </Stack.Navigator>
