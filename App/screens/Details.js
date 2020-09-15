@@ -1,7 +1,19 @@
 import React from "react";
-import { View, StyleSheet, SafeAreaView, Text, ScrollView } from "react-native";
+import {
+  View,
+  StyleSheet,
+  SafeAreaView,
+  Text,
+  ScrollView,
+  Dimensions,
+  InteractionManager,
+} from "react-native";
+import MapView, { Marker } from "react-native-maps";
 
 import { Button } from "../components/Button";
+import { geoFetch } from "../utils/api";
+
+const screen = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   container: {
@@ -30,16 +42,32 @@ const styles = StyleSheet.create({
     color: "#4A4A4A",
     marginBottom: 20,
   },
+  map: {
+    width: screen.width,
+    height: Math.round(screen.height * 0.25),
+  },
 });
 
 class Details extends React.Component {
   state = {
     loading: false,
     updatedItem: null,
+    showMap: false,
   };
 
-  handleLogPress = () => {
-    alert("todo!");
+  componentDidMount() {
+    InteractionManager.runAfterInteractions(() => {
+      this.setState({ showMap: true });
+    });
+  }
+
+  handleLogPress = (_id) => {
+    this.setState({ loading: true }, () => {
+      geoFetch(`log?_id=${_id}`, { method: "PUT" })
+        .then((response) => this.setState({ updatedItem: response.result }))
+        .catch((error) => console.log(error))
+        .finally(() => this.setState({ loading: false }));
+    });
   };
 
   render() {
@@ -50,6 +78,29 @@ class Details extends React.Component {
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView>
+          {this.state.showMap ? (
+            <MapView
+              style={styles.map}
+              region={{
+                latitude: item.latitude,
+                longitude: item.longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.0075,
+              }}
+              zoomEnabled={false}
+              scrollEnabled={false}
+            >
+              <Marker
+                coordinate={{
+                  latitude: item.latitude,
+                  longitude: item.longitude,
+                }}
+              />
+            </MapView>
+          ) : (
+            <View style={styles.map} />
+          )}
+
           <View style={styles.section}>
             <Text style={styles.titleText}>{item.title}</Text>
             <Text style={styles.text}>{item.description}</Text>
@@ -58,7 +109,7 @@ class Details extends React.Component {
             </Text>
             <Button
               text="Log"
-              onPress={this.handleLogPress}
+              onPress={() => this.handleLogPress(item._id)}
               loading={this.state.loading}
             />
           </View>
