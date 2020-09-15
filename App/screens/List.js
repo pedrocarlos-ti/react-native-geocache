@@ -2,12 +2,19 @@ import React from "react";
 import { ActivityIndicator } from "react-native";
 
 import { List, ListItem } from "../components/List";
+import { geoFetch } from "../utils/api";
 
 class ListScreen extends React.Component {
   state = {
     loading: true,
     list: [],
   };
+
+  componentDidMount() {
+    geoFetch("list").then((response) =>
+      this.setState({ loading: false, list: response.result })
+    );
+  }
 
   render() {
     if (this.state.loading) {
